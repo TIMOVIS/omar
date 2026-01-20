@@ -18,7 +18,7 @@ export default async function EditSessionPage({ params }: EditSessionPageProps) 
   const { data: profile } = await supabase
     .from('profiles')
     .select('id')
-    .single()
+    .single() as { data: { id: string } | null }
 
   const [session, students, locations, trainers] = await Promise.all([
     getSession(id),

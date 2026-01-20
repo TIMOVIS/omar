@@ -72,7 +72,7 @@ export default function StudentSignupPage() {
         email: data.email,
         full_name: data.full_name,
         role: 'student',
-      })
+      } as never)
 
     if (profileError) {
       console.error('Profile error:', profileError)
@@ -81,7 +81,7 @@ export default function StudentSignupPage() {
     // Try to link to existing student record by email
     const { error: linkError } = await supabase
       .from('students')
-      .update({ profile_id: authData.user.id })
+      .update({ profile_id: authData.user.id } as never)
       .eq('email', data.email)
       .is('profile_id', null)
 

@@ -17,7 +17,7 @@ export async function getTrainers(): Promise<Trainer[]> {
   const { data: profile } = await supabase
     .from('profiles')
     .select('organization_id')
-    .single()
+    .single() as { data: { organization_id: string | null } | null }
 
   if (!profile?.organization_id) {
     return []
@@ -29,7 +29,7 @@ export async function getTrainers(): Promise<Trainer[]> {
     .select('id, full_name, email, role')
     .eq('organization_id', profile.organization_id)
     .in('role', ['trainer', 'admin'])
-    .order('full_name')
+    .order('full_name') as { data: Trainer[] | null; error: { message: string } | null }
 
   if (error) throw new Error(error.message)
   return data ?? []
@@ -42,7 +42,7 @@ export async function inviteTrainer(email: string, fullName: string): Promise<{ 
   const { data: profile } = await supabase
     .from('profiles')
     .select('organization_id')
-    .single()
+    .single() as { data: { organization_id: string | null } | null }
 
   if (!profile?.organization_id) {
     return { success: false, error: 'No organization found' }
@@ -50,11 +50,11 @@ export async function inviteTrainer(email: string, fullName: string): Promise<{ 
 
   // For now, we'll create a placeholder profile that can be claimed later
   // In a real app, you'd send an invite email
-  const { error } = await supabase.rpc('add_trainer_to_org', {
+  const { error } = await supabase.rpc('add_trainer_to_org' as never, {
     trainer_email: email,
     trainer_name: fullName,
     org_id: profile.organization_id,
-  })
+  } as never)
 
   if (error) {
     return { success: false, error: error.message }

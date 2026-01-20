@@ -22,7 +22,7 @@ export async function completeOnboarding(formData: OnboardingFormData): Promise<
     .from('profiles')
     .select('organization_id')
     .eq('id', user.id)
-    .single()
+    .single() as { data: { organization_id: string | null } | null }
 
   if (existingProfile?.organization_id) {
     // Already has organization, just redirect
@@ -32,9 +32,9 @@ export async function completeOnboarding(formData: OnboardingFormData): Promise<
   // Create organization
   const { data: org, error: orgError } = await supabase
     .from('organizations')
-    .insert({ name: validated.data.organization_name })
+    .insert({ name: validated.data.organization_name } as never)
     .select()
-    .single()
+    .single() as { data: { id: string } | null; error: { message: string } | null }
 
   if (orgError) {
     console.error('Organization creation error:', orgError)
@@ -45,15 +45,15 @@ export async function completeOnboarding(formData: OnboardingFormData): Promise<
   const { error: profileError } = await supabase
     .from('profiles')
     .update({
-      organization_id: org.id,
+      organization_id: org!.id,
       full_name: validated.data.full_name,
       role: 'trainer',
-    })
+    } as never)
     .eq('id', user.id)
 
   if (profileError) {
     // Rollback: delete the organization if profile update fails
-    await supabase.from('organizations').delete().eq('id', org.id)
+    await supabase.from('organizations').delete().eq('id', org!.id)
     console.error('Profile update error:', profileError)
     return { success: false, error: `Failed to update profile: ${profileError.message}` }
   }

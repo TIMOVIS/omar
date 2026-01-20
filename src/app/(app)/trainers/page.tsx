@@ -14,7 +14,7 @@ export default async function TrainersPage() {
   const { data: profile } = await supabase
     .from('profiles')
     .select('id')
-    .single()
+    .single() as { data: { id: string } | null }
 
   const trainers = await getTrainers()
 

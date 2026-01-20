@@ -44,12 +44,12 @@ export async function signUp(formData: SignupFormData): Promise<{ success: boole
   }
 
   // 3. Call the setup_trainer function (bypasses RLS)
-  const { error: setupError } = await supabase.rpc('setup_trainer', {
+  const { error: setupError } = await supabase.rpc('setup_trainer' as never, {
     user_id: authData.user.id,
     user_email: validated.data.email,
     user_full_name: validated.data.full_name,
     org_name: validated.data.organization_name,
-  })
+  } as never)
 
   if (setupError) {
     console.error('Setup error:', setupError)

@@ -31,7 +31,7 @@ export async function getStudentSessions(): Promise<StudentSession[]> {
     .from('students')
     .select('id')
     .eq('profile_id', user.id)
-    .single()
+    .single() as { data: { id: string } | null }
 
   if (!student) return []
 
@@ -50,7 +50,7 @@ export async function getStudentSessions(): Promise<StudentSession[]> {
       )
     `)
     .eq('student_id', student.id)
-    .order('created_at', { ascending: false })
+    .order('created_at', { ascending: false }) as { data: { session: StudentSession | null }[] | null; error: { message: string } | null }
 
   if (error) {
     console.error('Error fetching student sessions:', error)
